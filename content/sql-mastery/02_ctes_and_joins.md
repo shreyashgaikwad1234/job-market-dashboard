@@ -4,66 +4,46 @@ Common Table Expressions (CTEs) provide a mechanism to write modular, readable q
 
 ## Standard CTE Implementation
 
-CTEs mitigate the readability issues associated with deeply nested subqueries.
+CTEs mitigate the readability issues associated with deeply nested subqueries. They are highly effective for filtering data based on pre-calculated aggregations, such as average salaries.
 
-**Example: Aggregation Pipeline**
+**Example: Salary Filtering Pipeline**
 
 ```sql
-WITH ActiveUsers AS (
-  SELECT user_id
-  FROM users
-  WHERE last_login >= CURRENT_DATE - INTERVAL '30 days'
+WITH RoleAverages AS (
+  SELECT job_title, AVG(salary_usd) AS avg_salary
+  FROM data_roles_salaries
+  GROUP BY job_title
 ),
-UserPurchases AS (
-  SELECT user_id, COUNT(*) as total_orders
-  FROM orders
-  GROUP BY user_id
+HighPayingRoles AS (
+  SELECT job_title, avg_salary
+  FROM RoleAverages
+  WHERE avg_salary > 120000
 )
-SELECT a.user_id, COALESCE(p.total_orders, 0) as total_orders
-FROM ActiveUsers a
-LEFT JOIN UserPurchases p ON a.user_id = p.user_id;
-```
-
-## Recursive CTEs
-
-Recursive CTEs reference their own output. They are strictly required for traversing hierarchical data structures (e.g., organizational charts, category trees).
-
-A recursive CTE requires an anchor member (base case) and a recursive member, combined via `UNION ALL`.
-
-**Example: Hierarchical Traversal**
-
-```sql
-WITH RECURSIVE OrgChart AS (
-  -- Anchor member
-  SELECT employee_id, name, manager_id, 1 as hierarchy_level
-  FROM employees
-  WHERE manager_id IS NULL
-  
-  UNION ALL
-  
-  -- Recursive member
-  SELECT e.employee_id, e.name, e.manager_id, o.hierarchy_level + 1
-  FROM employees e
-  INNER JOIN OrgChart o ON e.manager_id = o.employee_id
-)
-SELECT * FROM OrgChart
-ORDER BY hierarchy_level, manager_id;
+SELECT 
+  d.job_title,
+  d.salary_usd,
+  h.avg_salary
+FROM data_roles_salaries d
+INNER JOIN HighPayingRoles h ON d.job_title = h.job_title;
 ```
 
 ## Self Joins
 
-Self joins involve joining a table to itself. This is typically used for comparing rows within the same table or establishing pairwise relationships.
+Self joins involve joining a table to itself. This is typically used for comparing rows within the same table, such as finding salary discrepancies across experience levels in the same location.
 
-**Example: Pairwise Comparison**
+**Example: Finding Salary Discrepancies**
 
 ```sql
 SELECT 
-  c1.customer_id AS customer_1,
-  c2.customer_id AS customer_2,
-  c1.signup_date
-FROM customers c1
-INNER JOIN customers c2 
-  ON c1.signup_date = c2.signup_date
-  AND c1.customer_id < c2.customer_id
-ORDER BY c1.signup_date;
+  junior.job_title,
+  junior.location,
+  junior.salary_usd AS junior_salary,
+  senior.salary_usd AS senior_salary
+FROM data_roles_salaries junior
+INNER JOIN data_roles_salaries senior 
+  ON junior.location = senior.location
+  AND junior.job_title = senior.job_title
+  AND junior.experience_level = 'Entry'
+  AND senior.experience_level = 'Senior'
+WHERE junior.salary_usd > senior.salary_usd;
 ```

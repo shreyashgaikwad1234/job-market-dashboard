@@ -1,0 +1,11 @@
+posting_id,job_title,experience_level,salary_usd,remote_ratio,company_size,primary_skill,posting_date,location
+JOB-001,Data Scientist,Senior,165000,100,Large,Python,2023-01-15,San Francisco
+JOB-002,Data Analyst,Entry,75000,50,Medium,SQL,2023-01-22,New York
+JOB-003,Data Engineer,Mid,135000,100,Large,Apache Spark,2023-02-10,Austin
+JOB-004,Machine Learning Engineer,Senior,185000,0,Large,PyTorch,2023-03-05,Seattle
+JOB-005,Data Scientist,Mid,125000,100,Medium,SQL,2023-03-12,Remote
+JOB-006,Analytics Engineer,Mid,115000,100,Small,dbt,2023-04-01,Remote
+JOB-007,Data Engineer,Lead,195000,50,Large,Kafka,2023-05-20,San Francisco
+JOB-008,Data Analyst,Mid,95000,0,Medium,Tableau,2023-06-11,Chicago
+JOB-009,Data Scientist,Entry,85000,100,Small,Python,2023-07-01,Remote
+JOB-010,Machine Learning Engineer,Mid,145000,100,Medium,TensorFlow,2023-08-15,Boston

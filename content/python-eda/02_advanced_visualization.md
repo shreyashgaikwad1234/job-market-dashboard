@@ -23,37 +23,38 @@ sns.set_theme(style="white", rc={
 
 ## Density and Distribution Plots
 
-When analyzing the distribution of continuous variables segmented by a categorical outcome (e.g., churn), Kernel Density Estimation (KDE) plots provide a smoother representation than standard histograms.
+When analyzing the distribution of continuous variables segmented by a categorical outcome (e.g., job titles), Kernel Density Estimation (KDE) plots provide a smoother representation than standard histograms. This is highly effective for visualizing overlapping salary bands.
 
 ```python
 fig, ax = plt.subplots(figsize=(10, 6))
 
 sns.kdeplot(
-    data=df, 
-    x="days_since_last_purchase", 
-    hue="churned", 
+    data=main_roles, 
+    x="salary_usd", 
+    hue="job_title", 
     fill=True, 
     alpha=0.6, 
-    palette=["#10B981", "#EF4444"], # Emerald vs Rose
+    palette=["#3B82F6", "#10B981", "#8B5CF6"], # Blue, Emerald, Purple
     ax=ax
 )
 
-ax.set_title("Customer Activity Distribution by Churn Status", pad=20)
+ax.set_title("Salary Distribution by Core Data Roles", pad=20)
+ax.xaxis.set_major_formatter('${x:,.0f}') # Format as currency
 ax.set_yticks([]) # Remove y-axis ticks as absolute density values are rarely needed
 plt.tight_layout()
 ```
 
 ## High-Density Bar Charts
 
-For categorical data, horizontal bar charts with direct data labels eliminate the need for an x-axis, improving the data-to-ink ratio.
+For categorical data (such as top-paying skills), horizontal bar charts with direct data labels eliminate the need for an x-axis, improving the data-to-ink ratio.
 
 ```python
 fig, ax = plt.subplots(figsize=(10, 5))
     
 bars = sns.barplot(
-    data=channel_rev, 
-    y="acquisition_channel", 
-    x="total_revenue", 
+    data=skill_rev, 
+    y="primary_skill", 
+    x="salary_usd", 
     color="#3B82F6",
     ax=ax
 )
@@ -65,7 +66,7 @@ for i, p in enumerate(bars.patches):
             f"${width:,.0f}", 
             ha="left", va="center")
 
-ax.set_title("Total Revenue by Acquisition Channel", pad=20)
+ax.set_title("Average Salary by Primary Technical Skill", pad=20)
 ax.set_xlabel("")
 ax.set_ylabel("")
 ax.set_xticks([]) # Remove x-axis entirely

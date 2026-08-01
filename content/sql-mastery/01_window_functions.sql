@@ -1,55 +1,45 @@
 -- =====================================================================
--- 01: ADVANCED WINDOW FUNCTIONS
+-- 01: ADVANCED WINDOW FUNCTIONS (JOB MARKET ANALYTICS)
 -- =====================================================================
 -- Description:
--- Demonstrates the use of RANK, DENSE_RANK, LEAD, LAG, and running totals
--- over an e-commerce transactional dataset. This is highly requested in 
--- top-tier Data Engineering & Analytics interviews.
+-- Demonstrates the use of RANK, DENSE_RANK, LEAD, LAG, and percentiles
+-- over a dataset of Data Science salaries and roles.
 -- =====================================================================
 
--- 1. Ranking Customers by Total Spend (DENSE_RANK vs RANK)
--- Identifying top-tier customers without gaps in ranking if there are ties.
+-- 1. Ranking Job Titles by Highest Salary (DENSE_RANK vs RANK)
+-- Identifying the top-paying roles within specific experience levels.
 SELECT 
-    customer_id,
-    customer_segment,
-    total_revenue,
-    RANK() OVER (ORDER BY total_revenue DESC) AS revenue_rank,
-    DENSE_RANK() OVER (ORDER BY total_revenue DESC) AS revenue_dense_rank
-FROM ecommerce_churn_data
-WHERE churned = 0
-ORDER BY total_revenue DESC;
+    job_title,
+    experience_level,
+    salary_usd,
+    RANK() OVER (PARTITION BY experience_level ORDER BY salary_usd DESC) AS salary_rank,
+    DENSE_RANK() OVER (PARTITION BY experience_level ORDER BY salary_usd DESC) AS salary_dense_rank
+FROM data_roles_salaries
+ORDER BY experience_level, salary_usd DESC;
 
--- 2. Calculating Moving Averages & Running Totals
--- Useful for smoothing out volatility in revenue across cohorts or time.
+-- 2. Calculating Salary Percentiles (PERCENT_RANK)
+-- Find out what percentile a specific salary falls into across the entire dataset.
 SELECT 
-    signup_date,
-    total_revenue,
-    SUM(total_revenue) OVER (
-        ORDER BY signup_date 
-        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-    ) AS running_total_revenue,
-    AVG(total_revenue) OVER (
-        ORDER BY signup_date 
-        ROWS BETWEEN 3 PRECEDING AND CURRENT ROW
-    ) AS rolling_3day_avg
-FROM ecommerce_churn_data
-ORDER BY signup_date;
+    job_title,
+    experience_level,
+    salary_usd,
+    ROUND(PERCENT_RANK() OVER (ORDER BY salary_usd) * 100, 2) AS salary_percentile
+FROM data_roles_salaries
+ORDER BY salary_percentile DESC;
 
--- 3. Time-Series Analysis: LEAD and LAG
--- Comparing a customer's current order value to their previous ones (simulated with aggregate data)
--- or finding the gap in days between customer signups in a specific channel.
+-- 3. Comparing Current Job Posting Salary to Previous (LEAD and LAG)
+-- See how a specific role's salary trended over time based on posting date.
 SELECT 
-    customer_id,
-    acquisition_channel,
-    signup_date,
-    LAG(signup_date, 1) OVER (
-        PARTITION BY acquisition_channel 
-        ORDER BY signup_date
-    ) AS previous_channel_signup,
-    -- Calculate days between signups in the same channel
-    signup_date - LAG(signup_date, 1) OVER (
-        PARTITION BY acquisition_channel 
-        ORDER BY signup_date
-    ) AS days_since_last_channel_signup
-FROM ecommerce_churn_data
-ORDER BY acquisition_channel, signup_date;
+    job_title,
+    posting_date,
+    salary_usd,
+    LAG(salary_usd, 1) OVER (
+        PARTITION BY job_title 
+        ORDER BY posting_date
+    ) AS previous_posting_salary,
+    salary_usd - LAG(salary_usd, 1) OVER (
+        PARTITION BY job_title 
+        ORDER BY posting_date
+    ) AS salary_growth_since_last_posting
+FROM data_roles_salaries
+ORDER BY job_title, posting_date;

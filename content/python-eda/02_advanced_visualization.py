@@ -1,5 +1,5 @@
 # =====================================================================
-# 02: ADVANCED VISUALIZATIONS
+# 02: ADVANCED VISUALIZATIONS (JOB MARKET ANALYTICS)
 # =====================================================================
 # Description:
 # Demonstrates professional, enterprise-grade plotting techniques.
@@ -21,48 +21,55 @@ sns.set_theme(style="white", rc={
     "font.family": "sans-serif"
 })
 
-def plot_churn_distribution(df: pd.DataFrame):
+def plot_salary_distribution(df: pd.DataFrame):
     """
-    Plots a highly stylized distribution of days since last purchase,
-    segmented by churn status.
+    Plots a highly stylized distribution of salaries,
+    segmented by job title (focusing on Data Scientists vs Engineers).
     """
+    # Filter to main roles for cleaner visualization
+    main_roles = df[df['job_title'].isin(['Data Scientist', 'Data Engineer', 'Data Analyst'])]
+    
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # KDE Plot for smooth distributions
     sns.kdeplot(
-        data=df, 
-        x="days_since_last_purchase", 
-        hue="churned", 
+        data=main_roles, 
+        x="salary_usd", 
+        hue="job_title", 
         fill=True, 
         alpha=0.6, 
-        palette=["#10B981", "#EF4444"], # Professional Emerald vs Rose
+        palette=["#3B82F6", "#10B981", "#8B5CF6"], # Blue, Emerald, Purple
         ax=ax
     )
     
-    ax.set_title("Customer Activity Distribution by Churn Status", fontsize=16, fontweight='bold', pad=20)
-    ax.set_xlabel("Days Since Last Purchase", fontsize=12)
+    ax.set_title("Salary Distribution by Core Data Roles", fontsize=16, fontweight='bold', pad=20)
+    ax.set_xlabel("Salary (USD)", fontsize=12)
     ax.set_ylabel("Density", fontsize=12)
+    
+    # Format x-axis as currency
+    ax.xaxis.set_major_formatter('${x:,.0f}')
     
     # Remove y-axis ticks for cleaner look (density absolute values rarely matter)
     ax.set_yticks([])
     
     plt.tight_layout()
-    plt.savefig("churn_distribution.png", dpi=300)
-    print("Saved churn_distribution.png")
+    plt.savefig("salary_distribution.png", dpi=300)
+    print("Saved salary_distribution.png")
     plt.close()
 
-def plot_channel_revenue(df: pd.DataFrame):
+def plot_top_paying_skills(df: pd.DataFrame):
     """
-    Creates a professional horizontal bar chart of revenue by channel.
+    Creates a professional horizontal bar chart of the highest paying skills.
     """
-    channel_rev = df.groupby('acquisition_channel')['total_revenue'].sum().sort_values(ascending=False).reset_index()
+    # Calculate average salary per skill
+    skill_rev = df.groupby('primary_skill')['salary_usd'].mean().sort_values(ascending=False).reset_index()
     
     fig, ax = plt.subplots(figsize=(10, 5))
     
     bars = sns.barplot(
-        data=channel_rev, 
-        y="acquisition_channel", 
-        x="total_revenue", 
+        data=skill_rev, 
+        y="primary_skill", 
+        x="salary_usd", 
         color="#3B82F6", # Professional Blue
         ax=ax
     )
@@ -74,22 +81,22 @@ def plot_channel_revenue(df: pd.DataFrame):
                 f"${width:,.0f}", 
                 ha="left", va="center", fontsize=10, fontweight='bold', color="#4B5563")
     
-    ax.set_title("Total Revenue by Acquisition Channel", fontsize=16, fontweight='bold', pad=20)
+    ax.set_title("Average Salary by Primary Technical Skill", fontsize=16, fontweight='bold', pad=20)
     ax.set_xlabel("")
     ax.set_ylabel("")
     ax.set_xticks([]) # Remove x-axis for cleaner look, relying on data labels
     
     plt.tight_layout()
-    plt.savefig("channel_revenue.png", dpi=300)
-    print("Saved channel_revenue.png")
+    plt.savefig("top_paying_skills.png", dpi=300)
+    print("Saved top_paying_skills.png")
     plt.close()
 
 if __name__ == "__main__":
-    file_path = "../../datasets/ecommerce_churn_data.csv"
+    file_path = "../../datasets/data_roles_salaries.csv"
     try:
         df = pd.read_csv(file_path)
-        print("Generating professional visualizations...")
-        plot_churn_distribution(df)
-        plot_channel_revenue(df)
+        print("Generating professional job market visualizations...")
+        plot_salary_distribution(df)
+        plot_top_paying_skills(df)
     except FileNotFoundError:
         print(f"Dataset not found at {file_path}. Ensure you are running this from the correct directory.")

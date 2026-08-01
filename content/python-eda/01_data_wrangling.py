@@ -1,10 +1,10 @@
 # =====================================================================
-# 01: ADVANCED DATA WRANGLING
+# 01: ADVANCED DATA WRANGLING (JOB MARKET ANALYTICS)
 # =====================================================================
 # Description:
 # Demonstrates professional data wrangling techniques using Pandas.
 # Emphasizes vectorization over slow iterative loops, multi-indexing,
-# and handling missing data gracefully.
+# and handling missing data gracefully in Job Market datasets.
 # =====================================================================
 
 import pandas as pd
@@ -18,8 +18,7 @@ def load_and_clean_data(filepath: str) -> pd.DataFrame:
     df.columns = df.columns.str.lower().str.replace(' ', '_')
     
     # Convert date columns to datetime objects
-    df['signup_date'] = pd.to_datetime(df['signup_date'])
-    df['last_purchase_date'] = pd.to_datetime(df['last_purchase_date'])
+    df['posting_date'] = pd.to_datetime(df['posting_date'])
     
     return df
 
@@ -28,50 +27,49 @@ def feature_engineering_vectorized(df: pd.DataFrame) -> pd.DataFrame:
     Demonstrates fast, vectorized feature engineering.
     AVOID using df.apply() when vectorization is possible.
     """
-    # 1. Vectorized date math
-    df['customer_tenure_days'] = (df['last_purchase_date'] - df['signup_date']).dt.days
-    
-    # 2. np.where for conditional logic (much faster than .apply)
-    # Flag high-value retained customers
-    df['is_high_value_retained'] = np.where(
-        (df['total_revenue'] > 1000) & (df['churned'] == 0), 
+    # 1. np.where for conditional logic (much faster than .apply)
+    # Flag high-paying remote roles
+    df['is_high_paying_remote'] = np.where(
+        (df['salary_usd'] > 150000) & (df['remote_ratio'] == 100), 
         True, 
         False
     )
     
+    # 2. Vectorized text matching
+    # Identify management roles based on job title
+    df['is_management'] = df['job_title'].str.contains('Lead|Manager|Director', case=False, na=False)
+    
     return df
 
-def calculate_cohort_retention(df: pd.DataFrame) -> pd.DataFrame:
+def calculate_salary_bands(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculates average order value and churn rate grouped by acquisition cohort.
+    Calculates average salary and remote ratio grouped by role and experience.
     Demonstrates multi-indexing and aggregation.
     """
-    # Create cohort month feature
-    df['cohort_month'] = df['signup_date'].dt.to_period('M')
-    
     # Aggregate metrics
-    cohort_metrics = df.groupby(['cohort_month', 'acquisition_channel']).agg({
-        'customer_id': 'nunique',
-        'total_revenue': 'sum',
-        'churned': 'mean' # Mean of a 0/1 column gives the churn rate percentage
+    salary_bands = df.groupby(['job_title', 'experience_level']).agg({
+        'posting_id': 'nunique',
+        'salary_usd': 'mean',
+        'remote_ratio': 'mean' 
     }).rename(columns={
-        'customer_id': 'total_customers',
-        'churned': 'churn_rate'
+        'posting_id': 'total_postings',
+        'salary_usd': 'avg_salary_usd',
+        'remote_ratio': 'avg_remote_pct'
     })
     
-    return cohort_metrics
+    return salary_bands
 
 if __name__ == "__main__":
     # Ensure this runs relative to the project root
-    file_path = "../../datasets/ecommerce_churn_data.csv"
+    file_path = "../../datasets/data_roles_salaries.csv"
     
     try:
         raw_df = load_and_clean_data(file_path)
         engineered_df = feature_engineering_vectorized(raw_df)
-        cohorts = calculate_cohort_retention(engineered_df)
+        salary_metrics = calculate_salary_bands(engineered_df)
         
-        print("\n--- Cohort Metrics ---")
-        print(cohorts.head(10))
+        print("\n--- Salary Metrics by Role & Experience ---")
+        print(salary_metrics.head(10))
         
     except FileNotFoundError:
         print(f"Dataset not found at {file_path}. Ensure you are running this from the correct directory.")

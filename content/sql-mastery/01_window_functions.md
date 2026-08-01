@@ -1,6 +1,6 @@
 # Window Functions
 
-Window functions perform calculations across a set of table rows that are related to the current row. This section outlines standard implementations for ranking, offset, and aggregate window functions.
+Window functions perform calculations across a set of table rows that are related to the current row. This section outlines standard implementations for ranking, offset, and aggregate window functions using job market data.
 
 All examples adhere to standard ANSI SQL.
 
@@ -16,57 +16,44 @@ Ranking functions assign a rank to each row within a partition.
 | `RANK()` | Rank with gaps | `1, 1, 3, 4` |
 | `DENSE_RANK()` | Rank without gaps | `1, 1, 2, 3` |
 
-**Example: Category Ranking**
+**Example: Ranking Salaries by Experience Level**
 
 ```sql
-WITH ProductSales AS (
-  SELECT 
-    category,
-    product_name,
-    SUM(sales_amount) as total_revenue
-  FROM orders
-  GROUP BY category, product_name
-)
-SELECT * FROM (
-  SELECT 
-    category,
-    product_name,
-    total_revenue,
-    DENSE_RANK() OVER(PARTITION BY category ORDER BY total_revenue DESC) as rank
-  FROM ProductSales
-) ranked
-WHERE rank <= 3;
+SELECT 
+  job_title,
+  experience_level,
+  salary_usd,
+  DENSE_RANK() OVER(PARTITION BY experience_level ORDER BY salary_usd DESC) as rank
+FROM data_roles_salaries;
+```
+
+## Percentiles
+
+Window functions can calculate statistical percentiles, critical for analyzing salary bands.
+
+**Example: Salary Percentile Calculation**
+
+```sql
+SELECT 
+  job_title,
+  salary_usd,
+  ROUND(PERCENT_RANK() OVER (ORDER BY salary_usd) * 100, 2) AS salary_percentile
+FROM data_roles_salaries;
 ```
 
 ## Offset Functions (LAG and LEAD)
 
-Offset functions access data from subsequent or previous rows in the same result set without requiring self-joins.
+Offset functions access data from subsequent or previous rows in the same result set without requiring self-joins, useful for tracking salary growth over time.
 
-**Example: Month-over-Month (MoM) Calculation**
+**Example: Salary Trend Over Time**
 
 ```sql
 SELECT 
-  month,
-  mrr,
-  LAG(mrr, 1) OVER(ORDER BY month) as prev_month_mrr,
-  (mrr - LAG(mrr, 1) OVER(ORDER BY month)) / LAG(mrr, 1) OVER(ORDER BY month) * 100 as mom_growth_pct
-FROM saas_revenue
-ORDER BY month;
-```
-
-## Running Totals
-
-Cumulative aggregations utilize the `ROWS` or `RANGE` clause within the window definition.
-
-**Example: Cumulative Revenue**
-
-```sql
-SELECT
-  order_date,
-  daily_revenue,
-  SUM(daily_revenue) OVER(
-    ORDER BY order_date
-    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-  ) as cumulative_revenue
-FROM daily_sales;
+  job_title,
+  posting_date,
+  salary_usd,
+  LAG(salary_usd, 1) OVER(PARTITION BY job_title ORDER BY posting_date) as prev_salary,
+  (salary_usd - LAG(salary_usd, 1) OVER(PARTITION BY job_title ORDER BY posting_date)) / 
+  LAG(salary_usd, 1) OVER(PARTITION BY job_title ORDER BY posting_date) * 100 as growth_pct
+FROM data_roles_salaries;
 ```

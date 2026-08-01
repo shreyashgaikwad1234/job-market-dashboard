@@ -14,9 +14,9 @@ Data Skills Matrix is a world-class, enterprise-grade educational repository and
 
 ## 🚀 Key Features
 ### 🧠 Advanced SQL Mastery
-* **Complex Window Functions:** In-depth execution of `RANK()`, `DENSE_RANK()`, `LEAD()`, and `LAG()` for sophisticated time-series and comparative analysis.
-* **Hierarchical Data Engineering:** Utilizing Common Table Expressions (CTEs) and recursive CTEs to build readable, modular, and optimized queries.
-* **Real-World Analytics Scenarios:** Exact, interview-ready SQL implementations for enterprise metrics including Cohort Analysis, Churn Calculation, and Conversion Funnels.
+* **Complex Window Functions:** In-depth execution of `RANK()`, `DENSE_RANK()`, `LEAD()`, and `LAG()` for calculating salary percentiles and tracking compensation growth.
+* **Hierarchical Data Engineering:** Utilizing Common Table Expressions (CTEs) and recursive CTEs to build readable, modular, and optimized queries for filtering high-paying roles.
+* **Real-World Analytics Scenarios:** Exact, interview-ready SQL implementations for enterprise metrics including Skill Demand Analysis, Remote Work Trends, and Salary Discrepancies.
 
 ### 🏛️ Professional Python EDA
 * **High-Performance Data Wrangling:** Showcasing efficient Pandas techniques, specifically emphasizing the performance delta between vectorization and `.apply()` operations on large datasets.
@@ -40,15 +40,15 @@ Data Skills Matrix uses a modular directory structure to separate distinct compe
 
 ## 🕵️ Data Science Deep-Dive
 ### Optimization: Vectorization vs. Iteration
-In enterprise environments, data volume makes standard Python loops unscalable. This repository heavily emphasizes Pandas vectorization, demonstrating how to broadcast operations across entire arrays in C, resulting in performance improvements magnitudes faster than standard `.apply()` or iterative approaches.
+In enterprise environments, data volume makes standard Python loops unscalable. This repository heavily emphasizes Pandas vectorization, demonstrating how to broadcast operations across entire arrays in C to categorize job titles and salaries significantly faster than standard `.apply()` or iterative approaches.
 
-### Analytics: Cohorts and Churn
-Understanding customer behavior over time is the bedrock of SaaS analytics. The SQL modules break down exactly how to architect a cohort retention matrix entirely within the database layer, isolating acquisition cohorts and tracking their retention rate month-over-month.
+### Analytics: Salary Trends and Skills
+Understanding compensation trends is the bedrock of job market analytics. The SQL modules break down exactly how to architect complex queries to isolate top-paying skills, compare remote vs onsite ratios, and track month-over-month job market growth.
 
 ## 📈 Executive Impact
 Data Skills Matrix is designed to demonstrate three core proficiencies:
 * **Senior-Level Querying:** Writing SQL that is not just correct, but modular, scalable, and highly optimized for modern data warehouses.
-* **Business Acumen:** Focus on actionable business value (Churn, Funnels, Cohorts) over purely academic datasets.
+* **Business Acumen:** Focus on actionable business value (Salary Trends, Skill Demand, Remote Ratios) over purely academic datasets.
 * **Data Storytelling:** Combining rigorous statistical analysis with cinematic, high-density visualizations that executives and stakeholders can immediately interpret.
 
 ## ⚖️ License
