@@ -1,11 +1,4 @@
-# =====================================================================
-# 01: ADVANCED DATA WRANGLING (JOB MARKET ANALYTICS)
-# =====================================================================
-# Description:
-# Demonstrates professional data wrangling techniques using Pandas.
-# Emphasizes vectorization over slow iterative loops, multi-indexing,
-# and handling missing data gracefully in Job Market datasets.
-# =====================================================================
+
 
 import pandas as pd
 import numpy as np
