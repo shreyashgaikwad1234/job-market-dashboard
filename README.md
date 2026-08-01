@@ -1,4 +1,4 @@
-# Data Skills Matrix (v1.0.0-PRO)
+# Data Skills Matrix
 
 ![SQL](https://img.shields.io/badge/Language-SQL-4479A1)
 ![Python](https://img.shields.io/badge/Language-Python-3776AB)
