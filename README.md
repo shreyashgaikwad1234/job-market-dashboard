@@ -1,61 +1,58 @@
-<div align="center">
-  <img src="https://img.shields.io/badge/Data%20Science-Ready-blue?style=for-the-badge" alt="Data Science Ready" />
-  <img src="https://img.shields.io/badge/SQL-Mastery-orange?style=for-the-badge&logo=mysql&logoColor=white" alt="SQL Mastery" />
-  <img src="https://img.shields.io/badge/Python-EDA-yellow?style=for-the-badge&logo=python&logoColor=white" alt="Python EDA" />
-  
-  <br />
-  
-  <h1>📊 Data Skills Matrix</h1>
-  <p><b>The ultimate, industry-standard learning and portfolio resource for Data Scientists and Analysts.</b></p>
-</div>
+# Data Skills Matrix (v1.0.0-PRO)
 
-<br />
+![SQL](https://img.shields.io/badge/Language-SQL-4479A1)
+![Python](https://img.shields.io/badge/Language-Python-3776AB)
+![Pandas](https://img.shields.io/badge/Library-Pandas-150458)
+![Matplotlib](https://img.shields.io/badge/Library-Matplotlib-11557C)
+![Seaborn](https://img.shields.io/badge/Library-Seaborn-4C6C82)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791)
+![Analytics](https://img.shields.io/badge/Domain-Analytics-FF694B)
 
-Welcome to the **Data Skills Matrix**. This repository has been completely transformed from a web application into an elite, high-density educational resource. It contains practical, interview-ready, and production-grade tutorials, code snippets, and methodologies used by top tech companies.
+**Domain:** Data Analytics | **Core Language:** SQL | **EDA:** Python | **Focus:** Enterprise Scenarios
 
-> [!NOTE]
-> This repository focuses on actual code execution, performance optimization, and real-world analytical scenarios rather than theoretical concepts.
+Data Skills Matrix is a world-class, enterprise-grade educational repository and portfolio resource designed to showcase top-tier data science and analytics competencies. Moving beyond theoretical tutorials, it provides highly optimized, production-ready code for complex SQL querying, sophisticated data wrangling, and professional-grade visualizations used by industry-leading tech companies.
 
-## 🗂️ Repository Structure
+## 🚀 Key Features
+### 🧠 Advanced SQL Mastery
+* **Complex Window Functions:** In-depth execution of `RANK()`, `DENSE_RANK()`, `LEAD()`, and `LAG()` for sophisticated time-series and comparative analysis.
+* **Hierarchical Data Engineering:** Utilizing Common Table Expressions (CTEs) and recursive CTEs to build readable, modular, and optimized queries.
+* **Real-World Analytics Scenarios:** Exact, interview-ready SQL implementations for enterprise metrics including Cohort Analysis, Churn Calculation, and Conversion Funnels.
 
-### 1. 🗄️ [SQL Mastery](./content/sql-mastery)
-The SQL modules focus on advanced querying techniques required for complex analytical tasks and data engineering pipelines.
+### 🏛️ Professional Python EDA
+* **High-Performance Data Wrangling:** Showcasing efficient Pandas techniques, specifically emphasizing the performance delta between vectorization and `.apply()` operations on large datasets.
+* **Enterprise Visualizations:** High-density, professional chart templates using Matplotlib, Seaborn, and Plotly designed for SaaS dashboards and executive reporting.
+* **Statistical Rigor:** Comprehensive methodologies for outlier detection, missing data imputation, and correlation analysis to ensure data integrity before modeling.
 
-- **[01. Advanced Window Functions](./content/sql-mastery/01_window_functions.md)**
-  - `RANK()`, `DENSE_RANK()`, `ROW_NUMBER()`
-  - `LEAD()` and `LAG()` for time-series analysis
-  - Running totals and moving averages
-- **[02. CTEs & Advanced Joins](./content/sql-mastery/02_ctes_and_joins.md)**
-  - Common Table Expressions (CTEs) for readability
-  - Recursive CTEs for hierarchical data
-  - Self joins and complex non-equi joins
-- **[03. Real-World Analytics Scenarios](./content/sql-mastery/03_real_world_scenarios.md)**
-  - Cohort Analysis
-  - Churn Calculation
-  - Conversion Funnel Analysis
+## 🛠️ Tech Stack
+| Layer | Technology |
+| :--- | :--- |
+| **Languages** | SQL, Python 3.11 |
+| **Data Wrangling** | Pandas, NumPy |
+| **Visualization** | Matplotlib, Seaborn, Plotly |
+| **Databases** | PostgreSQL / Standard SQL Dialects |
+| **Documentation** | Markdown, GitHub Flavored Markdown (GFM) |
 
-### 2. 🐍 [Python Exploratory Data Analysis (EDA)](./content/python-eda)
-The Python modules focus on efficient data wrangling and high-density, professional visualizations.
+## 🏗️ Repository Architecture
+Data Skills Matrix uses a modular directory structure to separate distinct competencies:
 
-- **[01. Advanced Data Wrangling](./content/python-eda/01_data_wrangling.md)**
-  - Vectorization vs. `.apply()` optimizations
-  - Multi-indexing and complex aggregations
-  - Strategies for missing data imputation
-- **[02. Professional Visualizations](./content/python-eda/02_advanced_visualization.md)**
-  - Matplotlib & Seaborn templates for B2B/SaaS styles
-  - Correlation matrices and pair plots
-  - Distribution and outlier analysis
+* **`content/sql-mastery/`:** Houses the advanced SQL querying modules. It progresses from foundational window functions to highly complex business logic scenarios.
+* **`content/python-eda/`:** Houses the Python Exploratory Data Analysis modules. It bridges the gap between raw data extraction and statistical understanding through code and visual storytelling.
+
+## 🕵️ Data Science Deep-Dive
+### Optimization: Vectorization vs. Iteration
+In enterprise environments, data volume makes standard Python loops unscalable. This repository heavily emphasizes Pandas vectorization, demonstrating how to broadcast operations across entire arrays in C, resulting in performance improvements magnitudes faster than standard `.apply()` or iterative approaches.
+
+### Analytics: Cohorts and Churn
+Understanding customer behavior over time is the bedrock of SaaS analytics. The SQL modules break down exactly how to architect a cohort retention matrix entirely within the database layer, isolating acquisition cohorts and tracking their retention rate month-over-month.
+
+## 📈 Executive Impact
+Data Skills Matrix is designed to demonstrate three core proficiencies:
+* **Senior-Level Querying:** Writing SQL that is not just correct, but modular, scalable, and highly optimized for modern data warehouses.
+* **Business Acumen:** Focus on actionable business value (Churn, Funnels, Cohorts) over purely academic datasets.
+* **Data Storytelling:** Combining rigorous statistical analysis with cinematic, high-density visualizations that executives and stakeholders can immediately interpret.
+
+## ⚖️ License
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-
-## 🚀 How to Use This Repository
-
-If you are preparing for a Data Science or Data Engineering interview, start with the **SQL Mastery** section, specifically the **Real-World Analytics Scenarios**. These are the exact types of questions asked during technical screenings at top-tier companies.
-
-If you are working on a personal portfolio project, use the **Python EDA** templates to ensure your data cleaning and visualizations meet professional standards.
-
-> [!IMPORTANT]
-> The original React/Astro frontend application has been archived in favor of this pure data-skills resource repository.
-
-## 🤝 Contributing
-Contributions are welcome! If you have an advanced SQL technique, a highly optimized Pandas trick, or a beautiful visualization template, feel free to open a Pull Request adding it to the respective `content/` directory.
+**Data Skills Matrix** • Engineering and Analyzing Global Data Streams.
