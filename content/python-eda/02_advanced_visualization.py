@@ -1,11 +1,4 @@
-# =====================================================================
-# 02: ADVANCED VISUALIZATIONS (JOB MARKET ANALYTICS)
-# =====================================================================
-# Description:
-# Demonstrates professional, enterprise-grade plotting techniques.
-# Strips away standard UI clutter (spines, gridlines) to create
-# high-density, editorial-quality charts suitable for SaaS dashboards.
-# =====================================================================
+
 
 import pandas as pd
 import matplotlib.pyplot as plt
