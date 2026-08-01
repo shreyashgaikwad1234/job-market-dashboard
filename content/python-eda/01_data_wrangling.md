@@ -1,96 +1,52 @@
-# Advanced Data Wrangling with Pandas
+# Advanced Data Wrangling (Pandas)
 
-> [!NOTE]
-> This guide covers advanced techniques for data manipulation using Pandas, focusing on performance, elegant multi-indexing, and robust missing data handling. Essential for data science and analytics interviews.
+This section covers standard methodologies for data transformation and cleaning using the Pandas library in Python, emphasizing performance optimizations necessary for large-scale datasets.
 
-## 1. Vectorization vs. `.apply()`
+## Performance: Vectorization over Iteration
 
-Vectorized operations in Pandas are implemented in C and operate on entire arrays, making them orders of magnitude faster than iterating row by row or using `.apply()`.
+When manipulating Pandas DataFrames, standard Python loops and `.apply()` functions introduce significant computational overhead. Vectorization utilizes optimized C code under the hood to perform operations on entire arrays concurrently.
 
-### The Performance Hierarchy
+### Example: Feature Engineering
 
-| Method | Speed | Flexibility | Use Case |
-|---|---|---|---|
-| Vectorization | Fastest (1x) | Low | Simple arithmetic, native NumPy/Pandas functions |
-| `np.where()` | Very Fast (1.5x) | Medium | Conditional logic (if-else) |
-| `.map()` / `.replace()` | Fast (2x) | Medium | Dictionary lookups, exact value replacement |
-| `.apply()` | Slow (10x-100x) | High | Complex custom Python logic |
-| `iterrows()` | Very Slow (1000x) | High | Almost never (anti-pattern) |
-
-> [!CAUTION]
-> Avoid `.apply()` unless absolutely necessary. It is essentially a glorified `for` loop under the hood.
-
-### Example: Optimizing Conditional Logic
-
-**Anti-pattern:**
 ```python
 import pandas as pd
 import numpy as np
 
-# Inefficient
-def categorize(salary):
-    if salary > 100000:
-        return 'High'
-    elif salary > 50000:
-        return 'Medium'
-    else:
-        return 'Low'
+# Anti-pattern (Iterative)
+def calculate_status_iterative(row):
+    if row['revenue'] > 1000 and row['churned'] == 0:
+        return True
+    return False
 
-df['Salary_Category'] = df['Salary'].apply(categorize)
+# df['high_value'] = df.apply(calculate_status_iterative, axis=1) # SLOW
+
+# Optimized Pattern (Vectorized)
+df['high_value'] = np.where((df['revenue'] > 1000) & (df['churned'] == 0), True, False) # FAST
 ```
 
-**Optimized Pattern (using `np.select`):**
-```python
-# Highly efficient
-conditions = [
-    (df['Salary'] > 100000),
-    (df['Salary'] > 50000)
-]
-choices = ['High', 'Medium']
-df['Salary_Category'] = np.select(conditions, choices, default='Low')
-```
+## Missing Data Imputation
 
-## 2. Mastering Multi-Indexing
-
-Multi-indexing allows for representing higher-dimensional data in a tabular format.
-
-### Grouping and Unstacking
+Handling missing values (`NaN`) requires domain-specific logic rather than arbitrary deletion.
 
 ```python
-# Grouping by multiple columns creates a MultiIndex Series
-grouped = df.groupby(['Department', 'Role'])['Salary'].mean()
+# Forward fill for time-series data
+df['daily_stock'] = df['daily_stock'].ffill()
 
-# Unstacking moves the inner index level to columns
-salary_matrix = grouped.unstack(level='Role')
+# Mean imputation grouped by category
+df['price'] = df['price'].fillna(df.groupby('category')['price'].transform('mean'))
 ```
 
-> [!TIP]
-> Use `.xs()` (cross-section) to elegantly select data at a particular level of a MultiIndex.
-> ```python
-> # Select all 'Data Scientist' roles across all departments
-> df.xs('Data Scientist', level='Role')
-> ```
+## Multi-Indexing and Aggregation
 
-## 3. Dealing with Missing Data Elegantly
+Aggregating data across multiple dimensions often results in a MultiIndex DataFrame.
 
-Handling missing data goes beyond just `.dropna()` or `.fillna(0)`.
-
-### Advanced Imputation Techniques
-
-1.  **Interpolation:** Useful for time-series data.
-    ```python
-    # Linear interpolation
-    df['Stock_Price'] = df['Stock_Price'].interpolate(method='linear')
-    ```
-2.  **Forward/Backward Fill:**
-    ```python
-    # Forward fill with a limit to avoid over-imputing
-    df['Status'] = df['Status'].ffill(limit=2)
-    ```
-3.  **Group-Specific Imputation:** Filling NaNs with the mean of a specific group.
-    ```python
-    df['Salary'] = df.groupby('Role')['Salary'].transform(lambda x: x.fillna(x.mean()))
-    ```
-
-> [!WARNING]
-> Always analyze the mechanism of missingness (MCAR, MAR, MNAR) before imputing. Group-specific imputation can mask systemic data collection errors.
+```python
+# Calculate total customers and churn rate by cohort and channel
+cohort_metrics = df.groupby(['cohort_month', 'acquisition_channel']).agg({
+    'customer_id': 'nunique',
+    'churned': 'mean'
+}).rename(columns={
+    'customer_id': 'total_customers',
+    'churned': 'churn_rate'
+})
+```

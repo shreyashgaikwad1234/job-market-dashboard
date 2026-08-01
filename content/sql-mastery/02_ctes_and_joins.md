@@ -1,15 +1,12 @@
-# 🧩 Advanced CTEs and Joins
+# Common Table Expressions (CTEs) and Joins
 
-Common Table Expressions (CTEs) and advanced joins are the building blocks of readable and complex SQL queries.
+Common Table Expressions (CTEs) provide a mechanism to write modular, readable queries by establishing temporary result sets.
 
-## 🏗️ Common Table Expressions (CTEs)
+## Standard CTE Implementation
 
-CTEs allow you to create temporary result sets that can be referenced within a `SELECT`, `INSERT`, `UPDATE`, or `DELETE` statement. 
+CTEs mitigate the readability issues associated with deeply nested subqueries.
 
-> [!NOTE]
-> CTEs make complex queries much more readable by breaking them down into logical, sequential steps.
-
-### Basic CTE Example
+**Example: Aggregation Pipeline**
 
 ```sql
 WITH ActiveUsers AS (
@@ -22,76 +19,51 @@ UserPurchases AS (
   FROM orders
   GROUP BY user_id
 )
-SELECT a.user_id, COALESCE(p.total_orders, 0)
+SELECT a.user_id, COALESCE(p.total_orders, 0) as total_orders
 FROM ActiveUsers a
 LEFT JOIN UserPurchases p ON a.user_id = p.user_id;
 ```
 
-## 🔄 Recursive CTEs
+## Recursive CTEs
 
-Recursive CTEs reference themselves. They are perfect for querying hierarchical data, like organizational charts or bill of materials.
+Recursive CTEs reference their own output. They are strictly required for traversing hierarchical data structures (e.g., organizational charts, category trees).
 
-> [!IMPORTANT]
-> A recursive CTE consists of two parts: the anchor member (base case) and the recursive member, unioned together.
+A recursive CTE requires an anchor member (base case) and a recursive member, combined via `UNION ALL`.
 
-**Example: Employee Organization Chart**
+**Example: Hierarchical Traversal**
 
 ```sql
 WITH RECURSIVE OrgChart AS (
-  -- Anchor member: Start with the CEO (manager_id is NULL)
-  SELECT employee_id, name, manager_id, 1 as level
+  -- Anchor member
+  SELECT employee_id, name, manager_id, 1 as hierarchy_level
   FROM employees
   WHERE manager_id IS NULL
   
   UNION ALL
   
-  -- Recursive member: Find employees reporting to the previous level
-  SELECT e.employee_id, e.name, e.manager_id, o.level + 1
+  -- Recursive member
+  SELECT e.employee_id, e.name, e.manager_id, o.hierarchy_level + 1
   FROM employees e
   INNER JOIN OrgChart o ON e.manager_id = o.employee_id
 )
-SELECT * FROM OrgChart ORDER BY level, name;
+SELECT * FROM OrgChart
+ORDER BY hierarchy_level, manager_id;
 ```
 
-## 🔗 Advanced Joins
+## Self Joins
 
-While `INNER` and `LEFT` joins are standard, self joins and cross joins have specific, powerful use cases.
+Self joins involve joining a table to itself. This is typically used for comparing rows within the same table or establishing pairwise relationships.
 
-### Self Joins
-
-A self join is a regular join, but the table is joined with itself. It is useful for comparing rows within the same table.
-
-**Example: Finding users from the same city**
+**Example: Pairwise Comparison**
 
 ```sql
 SELECT 
-  a.user_name AS user_1, 
-  b.user_name AS user_2, 
-  a.city
-FROM users a
-JOIN users b 
-  ON a.city = b.city 
-  AND a.user_id < b.user_id; -- Prevents duplicate pairs and matching with oneself
-```
-
-> [!TIP]
-> The condition `a.user_id < b.user_id` is a classic trick to avoid commutative duplicates (A-B and B-A).
-
-### Cross Joins
-
-A `CROSS JOIN` produces the Cartesian product of two tables.
-
-> [!WARNING]
-> Use `CROSS JOIN` cautiously. Joining a 1000-row table with another 1000-row table yields 1,000,000 rows!
-
-**Example: Generating a Date Spine**
-
-Often used in reporting to ensure days with 0 metrics are still present.
-
-```sql
-SELECT date_dim.date, COALESCE(sales.amount, 0)
-FROM date_dimension date_dim
-CROSS JOIN (SELECT DISTINCT store_id FROM stores)
-LEFT JOIN daily_sales sales
-  ON date_dim.date = sales.date AND store_id = sales.store_id;
+  c1.customer_id AS customer_1,
+  c2.customer_id AS customer_2,
+  c1.signup_date
+FROM customers c1
+INNER JOIN customers c2 
+  ON c1.signup_date = c2.signup_date
+  AND c1.customer_id < c2.customer_id
+ORDER BY c1.signup_date;
 ```

@@ -1,86 +1,73 @@
-# Advanced Visualization for Exploratory Data Analysis
+# Advanced Data Visualization
 
-> [!NOTE]
-> Visualization is not just about making pretty charts; it's about uncovering hidden patterns. This guide covers high-density charts using Matplotlib, Seaborn, and Plotly.
+This section covers enterprise-grade data visualization patterns using Python. Standard default plots often contain unnecessary UI clutter (gridlines, borders, axis spines) that detract from the data.
 
-## Visualization Library Ecosystem
+## Configuration for Editorial Quality
 
-| Library | Strengths | Weaknesses | Best For |
-|---|---|---|---|
-| **Matplotlib** | Infinite customization | Verbose, archaic defaults | Base layers, complex custom plots |
-| **Seaborn** | Statistical aggregation, beautiful defaults | Hard to deeply customize | Quick EDA, statistical relationships |
-| **Plotly** | Interactivity, dashboards | Performance on huge datasets | Interactive EDA, presentations |
-
-## 1. High-Density Correlation Analysis
-
-When dealing with many numerical features, a standard scatter plot becomes unreadable.
-
-### The Seaborn Clustered Heatmap
-
-> [!TIP]
-> Use a clustered heatmap (`clustermap`) to automatically group highly correlated variables together, revealing latent structures in your dataset.
+Global aesthetic parameters can be defined using Seaborn to ensure consistency across all visualizations.
 
 ```python
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Calculate the correlation matrix
-corr = df.select_dtypes(include='number').corr()
-
-# Create a mask for the upper triangle (optional, for standard heatmap)
-# mask = np.triu(np.ones_like(corr, dtype=bool))
-
-# Generate a clustered heatmap
-sns.clustermap(corr, 
-               cmap='coolwarm', 
-               vmin=-1, vmax=1, 
-               annot=True, 
-               fmt=".2f",
-               figsize=(10, 8))
-plt.show()
+# Global editorial theme configuration
+sns.set_theme(style="white", rc={
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.spines.left": False,
+    "axes.grid": True,
+    "grid.alpha": 0.3,
+    "font.family": "sans-serif"
+})
 ```
 
-## 2. Multi-Dimensional Pair Plots
+## Density and Distribution Plots
 
-Pair plots are excellent for checking pairwise relationships and distributions simultaneously.
-
-### Advanced Pair Plotting
+When analyzing the distribution of continuous variables segmented by a categorical outcome (e.g., churn), Kernel Density Estimation (KDE) plots provide a smoother representation than standard histograms.
 
 ```python
-# Color by a categorical variable and add a KDE on the diagonal
-sns.pairplot(df, 
-             hue='Department', 
-             palette='husl',
-             diag_kind='kde',
-             plot_kws={'alpha': 0.6, 's': 20, 'edgecolor': 'k'})
-plt.show()
+fig, ax = plt.subplots(figsize=(10, 6))
+
+sns.kdeplot(
+    data=df, 
+    x="days_since_last_purchase", 
+    hue="churned", 
+    fill=True, 
+    alpha=0.6, 
+    palette=["#10B981", "#EF4444"], # Emerald vs Rose
+    ax=ax
+)
+
+ax.set_title("Customer Activity Distribution by Churn Status", pad=20)
+ax.set_yticks([]) # Remove y-axis ticks as absolute density values are rarely needed
+plt.tight_layout()
 ```
 
-> [!IMPORTANT]
-> If your dataset has >10 numerical columns, pair plots will take a very long time to render. Sub-sample your data or select specific columns using the `vars` parameter.
+## High-Density Bar Charts
 
-## 3. Interactive Distribution Analysis with Plotly
-
-For presentations or deep dives, interactive charts allow you to hover over outliers and zoom in on specific regions.
-
-### Plotly Violin Plots
-
-Violin plots combine box plots with kernel density estimations.
+For categorical data, horizontal bar charts with direct data labels eliminate the need for an x-axis, improving the data-to-ink ratio.
 
 ```python
-import plotly.express as px
+fig, ax = plt.subplots(figsize=(10, 5))
+    
+bars = sns.barplot(
+    data=channel_rev, 
+    y="acquisition_channel", 
+    x="total_revenue", 
+    color="#3B82F6",
+    ax=ax
+)
 
-fig = px.violin(df, 
-                y="Salary", 
-                x="Department", 
-                color="Role", 
-                box=True, # Add a box plot inside the violin
-                points="all", # Show all points
-                hover_data=df.columns) # Show all data on hover
-                
-fig.update_layout(title_text="Salary Distribution by Department and Role")
-fig.show()
+# Append direct data labels
+for i, p in enumerate(bars.patches):
+    width = p.get_width()
+    ax.text(width + (width * 0.02), p.get_y() + p.get_height()/2. + 0.1, 
+            f"${width:,.0f}", 
+            ha="left", va="center")
+
+ax.set_title("Total Revenue by Acquisition Channel", pad=20)
+ax.set_xlabel("")
+ax.set_ylabel("")
+ax.set_xticks([]) # Remove x-axis entirely
+plt.tight_layout()
 ```
-
-> [!CAUTION]
-> While Plotly is powerful, rendering thousands of points (`points="all"`) in a browser can cause performance issues. Consider `points="outliers"` for large datasets.
